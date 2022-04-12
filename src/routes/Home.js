@@ -12,11 +12,12 @@ import React, { useEffect, useState } from "react";
 import Nweet from "../components/Nweet";
 import { dbService, storageService } from "../fbase";
 import { v4 as uuidv4 } from "uuid";
+import { getDownloadURL } from "firebase/storage";
 
 const Home = ({ userObj }) => {
   const [nweet, setNweet] = useState("");
   const [nweets, setNweets] = useState([]);
-  const [attach, setAttach] = useState();
+  const [attach, setAttach] = useState("");
   /*const getNweets = async () => {
     // const dbNweets = await dbService.collection("nweets").get();
     const dbNweets = await getDocs(collection(dbService, "nweets"));
@@ -54,26 +55,33 @@ const Home = ({ userObj }) => {
     event.preventDefault();
     // const fileRef = storageService.ref().child(`${userObj.uid}/${uuidv4()}`);
     // const response = await fileRef.putString(attach, "data_url");
-    const fileRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
-    const response = await uploadString(fileRef, attach, "data_url");
-    console.log(response);
-
+    let attachURL = "";
+    if (attach !== "") {
+      const fileRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
+      const response = await uploadString(fileRef, attach, "data_url");
+      //console.log(response);
+      attachURL = await getDownloadURL(fileRef);
+      console.log(attachURL);
+    }
+    const nweetObj = {
+      text: nweet,
+      createdAt: Date.now(),
+      creatorId: userObj.uid,
+      attachURL,
+    };
     // await dbService.collection("nweets").add({
     //   nweet,
     //   createdAt: Date.now(),
     // });
     // setNweet("");
-    /*
+
     try {
-      const docRef = await addDoc(collection(dbService, "nweets"), {
-        text: nweet,
-        createdAt: Date.now(),
-        creatorId: userObj.uid,
-      });
+      const docRef = await addDoc(collection(dbService, "nweets"), nweetObj);
     } catch (error) {
       console.log("Err", error);
     }
-    setNweet("");*/
+    setNweet("");
+    setAttach("");
   };
   const onChange = (event) => {
     const {
@@ -97,7 +105,7 @@ const Home = ({ userObj }) => {
     reader.readAsDataURL(theFile);
   };
 
-  const clearAttach = () => setAttach(null);
+  const clearAttach = () => setAttach("");
 
   return (
     <div>
