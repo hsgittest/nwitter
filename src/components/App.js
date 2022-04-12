@@ -13,12 +13,12 @@ function App() {
     authService.onAuthStateChanged((user) => {
       if (user) {
         setIsLoggedIn(true);
-        // setUserObj(user);
-        setUserObj({
-          displayName: user.displayName,
-          uid: user.uid,
-          updateProfile: (args) => updateProfile(user, args),
-        });
+        setUserObj(user);
+        // setUserObj({
+        //   displayName: user.displayName,
+        //   uid: user.uid,
+        //   updateProfile: (args) => updateProfile(user, args),
+        // });
       } else {
         setIsLoggedIn(false);
       }
@@ -27,12 +27,13 @@ function App() {
   });
   const refreshUser = () => {
     // setUserObj(Object.assign({}, authService.currentUser));
-    const user = authService.currentUser;
-    setUserObj({
-      displayName: user.displayName,
-      uid: user.uid,
-      updateProfile: (args) => updateProfile(user, args),
-    });
+    // const user = authService.currentUser;
+    // setUserObj({
+    //   displayName: user.displayName,
+    //   uid: user.uid,
+    //   updateProfile: (args) => updateProfile(user, args),
+    // });
+    setUserObj(authService.currentUser);
   };
   return (
     <>
