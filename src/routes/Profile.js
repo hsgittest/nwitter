@@ -9,10 +9,12 @@ import { updateProfile } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService, dbService } from "../fbase";
+import Nweet from "components/Nweet";
 
 export default ({ refreshUser, userObj }) => {
   const navigate = useNavigate();
   const [newDisplayName, setNewDisplayName] = useState(userObj.displayName);
+  const [nweets, setNweets] = useState([]);
   const onLogOutClick = () => {
     authService.signOut();
     navigate("/");
@@ -26,7 +28,12 @@ export default ({ refreshUser, userObj }) => {
       orderBy("createdAt", "desc")
     );
     onSnapshot(q, (snapshot) => {
-      console.log(snapshot.docs.map((doc) => doc.data()));
+      //console.log(snapshot.docs.map((doc) => doc.data()));
+      const nweetArr = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setNweets(nweetArr);
     });
   };
   useEffect(() => {
@@ -55,6 +62,18 @@ export default ({ refreshUser, userObj }) => {
         <input type="submit" value="Update Profile" />
       </form>
       <button onClick={onLogOutClick}>Log Out</button>
+      <div>
+        {nweets.map((nweet) => (
+          <Nweet
+            key={nweet.id}
+            nweetObj={nweet}
+            isOwner={nweet.creatorId === userObj.uid}
+          />
+          //   <div key={nweet.id}>
+          //     <h4>{nweet.text}</h4>
+          //   </div>
+        ))}
+      </div>
     </>
   );
 };
